@@ -6,3 +6,4 @@ depend: [Vault]
 commands:
    ecotp:
       description: Teleports a player with the use of money.
+      usage: /<command> <player>

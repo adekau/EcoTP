@@ -34,18 +34,19 @@ public class EcoTP extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		try{
+		try {
 			config = getConfig();
-			File ec = new File("plugins" + File.separator + "EcoTP" + File.separator + "config.yml");
+			File ec = new File("plugins" + File.separator + "EcoTP"
+					+ File.separator + "config.yml");
 			ec.mkdir();
-			if(!config.contains("general.tpcost")){
-			config.set("general.tpcost", 200);
+			if (!config.contains("general.tpcost")) {
+				config.set("general.tpcost", 200);
 			}
 
 			saveConfig();
-			}catch(Exception e1){
+		} catch (Exception e1) {
 			e1.printStackTrace();
-			}
+		}
 
 		PluginDescriptionFile pdffile = this.getDescription();
 		this.logger.info(pdffile.getName() + " version " + pdffile.getVersion()

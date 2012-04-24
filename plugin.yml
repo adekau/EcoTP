@@ -1,0 +1,8 @@
+name: EcoTP
+main: me.potatofarms.ecotp.EcoTP
+version: 1.0
+depend: [Vault]
+
+commands:
+   ecotp:
+      description: Teleports a player with the use of money.

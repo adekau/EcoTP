@@ -99,20 +99,23 @@ public class EcoTP extends JavaPlugin {
 		Player player = (Player) sender;
 
 		if (commandLabel.equalsIgnoreCase("ecotp")) {
-			String subCommand = args.length > 1 ? args[0].toLowerCase() : "";
+			String subCommand = args.length > 0 ? args[0].toLowerCase() : "";
 			if (args.length == 0) {
 				player.sendMessage(ChatColor.RED
 						+ "Invalid Syntax. Correct Syntax is: /ecotp <targetplayer>");
+				return true;
 			} else if (args.length == 1) {
-				if (Bukkit.getServer().getPlayer(subCommand) == null) {
+				if (Bukkit.getServer().getPlayer(args[0]) == null) {
 					if (subCommand.equalsIgnoreCase("help")) {
 
 						player.sendMessage(ChatColor.GOLD + "EcoTP Help:");
 						player.sendMessage(ChatColor.GOLD + "Usage: "
 								+ ChatColor.BLUE + "/ecotp " + ChatColor.AQUA
 								+ "<targetplayer>");
+						return true;
 					}else if(subCommand.equalsIgnoreCase("bal") || subCommand.equalsIgnoreCase("balance")){
 						player.sendMessage(ChatColor.GREEN + "Your current balance is: " + ChatColor.GOLD + economy.getBalance(player.getName()));
+						return true;
 					}
 				}
 

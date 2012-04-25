@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
-import java.io.File;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -60,12 +59,9 @@ public class EcoTP extends JavaPlugin {
 	}
 
 	public void loadConfiguration() {
-		// See "Creating you're defaults"
-		String path = "general.tpcost";
-		plugin.getConfig().addDefault(path, "100");
-		plugin.getConfig().options().copyDefaults(true);
-		// Save the config whenever you manipulate it
-		plugin.saveConfig();
+		getConfig().addDefault("general.tpcost", 200);
+		getConfig().options().copyDefaults(true);
+		saveConfig();
 
 	}
 
@@ -101,32 +97,68 @@ public class EcoTP extends JavaPlugin {
 				player.sendMessage(ChatColor.RED
 						+ "Invalid Syntax. Correct Syntax is: /ecotp <targetplayer>");
 				return true;
-			} else if (args.length == 1) {
+			} else if (args.length >= 1) {
 				if (Bukkit.getServer().getPlayer(args[0]) == null) {
 					if (subCommand.equalsIgnoreCase("help")) {
-
-						player.sendMessage(ChatColor.GOLD + "EcoTP Help:");
-						player.sendMessage(ChatColor.GOLD + "Usage: "
-								+ ChatColor.BLUE + "/ecotp " + ChatColor.AQUA
-								+ "<targetplayer>");
+						if (player.hasPermission("ecotp.help")) {
+							player.sendMessage(ChatColor.GOLD + "EcoTP Help:");
+							player.sendMessage(ChatColor.GOLD + "Commands: "
+									+ ChatColor.BLUE + "/ecotp "
+									+ ChatColor.AQUA + "<targetplayer>");
+							player.sendMessage(ChatColor.BLUE + "/ecotp "
+									+ ChatColor.AQUA + "price" + ChatColor.GOLD + "-- Check the price of the teleport.");
+							player.sendMessage(ChatColor.BLUE + "/ecotp "
+									+ ChatColor.AQUA + "bal" + ChatColor.GOLD + "-- Check your current balance.");
+						} else {
+							player.sendMessage(ChatColor.RED
+									+ "You don't have permission to use this.");
+						}
 						return true;
+
 					} else if (subCommand.equalsIgnoreCase("bal")
 							|| subCommand.equalsIgnoreCase("balance")) {
-						player.sendMessage(ChatColor.GREEN
-								+ "Your current balance is: " + ChatColor.GOLD
-								+ economy.getBalance(player.getName()));
+						if (player.hasPermission("ecotp.balance")) {
+							player.sendMessage(ChatColor.GREEN
+									+ "Your current balance is: "
+									+ ChatColor.GOLD
+									+ economy.getBalance(player.getName()));
+						} else {
+							player.sendMessage(ChatColor.RED
+									+ "You don't have permission to use this.");
+						}
 						return true;
 					} else if (subCommand.equalsIgnoreCase("price")) {
-						player.sendMessage(ChatColor.GREEN + "It costs "
-								+ ChatColor.GOLD
-								+ getConfig().getInt("general.tpcost")
-								+ " to teleport");
+						if (player.hasPermission("ecotp.price")) {
+							player.sendMessage(ChatColor.GREEN + "It costs "
+									+ ChatColor.GOLD
+									+ getConfig().getInt("general.tpcost")
+									+ " to teleport");
+						} else {
+							player.sendMessage(ChatColor.RED
+									+ "You don't have permission to use this.");
+						}
 						return true;
 					} else if (subCommand.equalsIgnoreCase("reload")) {
-						reloadConfig();
+						if (player.hasPermission("ecotp.reload")) {
+							reloadConfig();
+						} else {
+							player.sendMessage(ChatColor.RED
+									+ "You don't have permission to use this.");
+						}
+						return true;
 					} else if (subCommand.equalsIgnoreCase("setprice")) {
-						String price = args.length > 1 ? args[1].toString() : "";
-						getConfig().set("general.tpcost", price);
+						if (player.hasPermission("ecotp.setprice")) {
+							String price = args.length > 1 ? args[1] : "";
+							int iprice;
+							iprice = Integer.parseInt(price);
+
+							getConfig().set("general.tpcost", iprice);
+							saveConfig();
+						} else {
+							player.sendMessage(ChatColor.RED
+									+ "You don't have permission to use this.");
+						}
+						return true;
 					}
 
 				}
@@ -135,29 +167,45 @@ public class EcoTP extends JavaPlugin {
 				int price = getConfig().getInt("general.tpcost");
 				String price_str = String.valueOf(price);
 				// Get the target player
+				if (player.hasPermission("ecotp.tp")) {
+					if (Bukkit.getServer().getPlayer(args[0]) != null) {
+						Player TargetPlayer = player.getServer().getPlayer(
+								args[0]);
+						if (TargetPlayer.getName().equalsIgnoreCase(
+								player.getName())) {
+							player.sendMessage(ChatColor.RED
+									+ "You cannot teleport to yourself.");
+							return true;
+						} else {
 
-				if (Bukkit.getServer().getPlayer(args[0]) != null) {
-					Player TargetPlayer = player.getServer().getPlayer(args[0]);
-					// get the target player's location
-					Location location = TargetPlayer.getLocation();
-					// Get balance of player (sender)
-					Double Balance = economy.getBalance(player.getName());
-					if (Balance >= price) {
-						// deduct money from balance
-						economy.withdrawPlayer(player.getName(), price);
-						// tell the player
-						player.sendMessage(ChatColor.GREEN + price_str
-								+ " has been deducted from your account");
-						// teleport player to other player's location
-						player.teleport(location);
-					} else if (Balance <= price) {
-						player.sendMessage(ChatColor.RED + "Not enough money.");
+						}
+						// get the target player's location
+						Location location = TargetPlayer.getLocation();
+						// Get balance of player (sender)
+						Double Balance = economy.getBalance(player.getName());
+						if (Balance >= price) {
+							// deduct money from balance
+							economy.withdrawPlayer(player.getName(), price);
+							// tell the player
+							player.sendMessage(ChatColor.GREEN + price_str
+									+ " has been deducted from your account");
+							// teleport player to other player's location
+							player.teleport(location);
+						} else if (Balance <= price) {
+							player.sendMessage(ChatColor.RED
+									+ "Not enough money.");
+							return true;
+						}
+					} else {
+
+						player.sendMessage(ChatColor.RED + "Player not online.");
 						return true;
+
 					}
 				} else {
-
-					player.sendMessage(ChatColor.RED + "Player not online.");
-
+					player.sendMessage(ChatColor.RED
+							+ "You don't have permission to use this.");
+					return true;
 				}
 
 			} else if (args.length == 2) {

@@ -39,7 +39,7 @@ public class EcoTP extends JavaPlugin {
 			File ec = new File("plugins" + File.separator + "EcoTP"
 					+ File.separator + "config.yml");
 			ec.mkdir();
-			if (!config.contains("general.tpcost")) {
+			if (!ec.exists()) {
 				config.set("general.tpcost", 200);
 			}
 
@@ -113,8 +113,15 @@ public class EcoTP extends JavaPlugin {
 								+ ChatColor.BLUE + "/ecotp " + ChatColor.AQUA
 								+ "<targetplayer>");
 						return true;
-					}else if(subCommand.equalsIgnoreCase("bal") || subCommand.equalsIgnoreCase("balance")){
-						player.sendMessage(ChatColor.GREEN + "Your current balance is: " + ChatColor.GOLD + economy.getBalance(player.getName()));
+					} else if (subCommand.equalsIgnoreCase("bal")
+							|| subCommand.equalsIgnoreCase("balance")) {
+						player.sendMessage(ChatColor.GREEN
+								+ "Your current balance is: " + ChatColor.GOLD
+								+ economy.getBalance(player.getName()));
+						return true;
+					} else if (subCommand.equalsIgnoreCase("price")) {
+						player.sendMessage(ChatColor.GREEN
+								+ "It costs " + ChatColor.GOLD + getConfig().getInt("general.tpcost") + " to teleport");
 						return true;
 					}
 				}
@@ -140,7 +147,7 @@ public class EcoTP extends JavaPlugin {
 						player.teleport(location);
 					} else if (Balance <= price) {
 						player.sendMessage(ChatColor.RED + "Not enough money.");
-
+						return true;
 					}
 				} else {
 

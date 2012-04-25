@@ -1,0 +1,3 @@
+general:
+  #Set the cost for teleporting.
+  tpcost: 200

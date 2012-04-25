@@ -34,20 +34,6 @@ public class EcoTP extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		try {
-			config = getConfig();
-			File ec = new File("plugins" + File.separator + "EcoTP"
-					+ File.separator + "config.yml");
-			ec.mkdir();
-			if (!ec.exists()) {
-				config.set("general.tpcost", 200);
-			}
-
-			saveConfig();
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-
 		PluginDescriptionFile pdffile = this.getDescription();
 		this.logger.info(pdffile.getName() + " version " + pdffile.getVersion()
 				+ "has been enabled.");
@@ -60,6 +46,7 @@ public class EcoTP extends JavaPlugin {
 		}
 		setupPermissions();
 		setupChat();
+		loadConfiguration();
 	}
 
 	private boolean setupPermissions() {
@@ -70,6 +57,16 @@ public class EcoTP extends JavaPlugin {
 			permission = permissionProvider.getProvider();
 		}
 		return (permission != null);
+	}
+
+	public void loadConfiguration() {
+		// See "Creating you're defaults"
+		String path = "general.tpcost";
+		plugin.getConfig().addDefault(path, "100");
+		plugin.getConfig().options().copyDefaults(true);
+		// Save the config whenever you manipulate it
+		plugin.saveConfig();
+
 	}
 
 	private boolean setupChat() {
@@ -120,10 +117,18 @@ public class EcoTP extends JavaPlugin {
 								+ economy.getBalance(player.getName()));
 						return true;
 					} else if (subCommand.equalsIgnoreCase("price")) {
-						player.sendMessage(ChatColor.GREEN
-								+ "It costs " + ChatColor.GOLD + getConfig().getInt("general.tpcost") + " to teleport");
+						player.sendMessage(ChatColor.GREEN + "It costs "
+								+ ChatColor.GOLD
+								+ getConfig().getInt("general.tpcost")
+								+ " to teleport");
 						return true;
+					} else if (subCommand.equalsIgnoreCase("reload")) {
+						reloadConfig();
+					} else if (subCommand.equalsIgnoreCase("setprice")) {
+						String price = args.length > 1 ? args[1].toString() : "";
+						getConfig().set("general.tpcost", price);
 					}
+
 				}
 
 				// get price from config

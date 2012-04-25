@@ -1,9 +1,39 @@
 name: EcoTP
 main: me.potatofarms.ecotp.EcoTP
-version: 1.1
+version: 1.2.1
 depend: [Vault]
 
 commands:
    ecotp:
       description: Teleports a player with the use of money.
       usage: /<command> <player>
+
+permissions:
+   ecotp.*:
+      description: Gives access to all ecotp commands.
+      children:
+         ecotp.tp: true
+         ecotp.reload: true
+         ecotp.price: true
+         ecotp.setprice: true
+         ecotp.help: true
+         ecotp.balance: true
+   ecotp.tp:
+      description: Allows a user to teleport
+      default: true
+   ecotp.reload:
+      description: Allows a user to reload the config.
+      default: op
+   ecotp.price:
+      description: Allows a user to view the price.
+      default: true
+   ecotp.setprice:
+      description: Allows a user to set the price of the teleport.
+      default: op
+   ecotp.help:
+      description: Allows a user to view the help page.
+      default: true
+   ecotp.balance:
+      description: Allows a user to view his/her balance.
+      default: true
+      

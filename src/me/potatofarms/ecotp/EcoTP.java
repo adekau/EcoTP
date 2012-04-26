@@ -106,9 +106,11 @@ public class EcoTP extends JavaPlugin {
 									+ ChatColor.BLUE + "/ecotp "
 									+ ChatColor.AQUA + "<targetplayer>");
 							player.sendMessage(ChatColor.BLUE + "/ecotp "
-									+ ChatColor.AQUA + "price" + ChatColor.GOLD + "-- Check the price of the teleport.");
+									+ ChatColor.AQUA + "price" + ChatColor.GOLD
+									+ "-- Check the price of the teleport.");
 							player.sendMessage(ChatColor.BLUE + "/ecotp "
-									+ ChatColor.AQUA + "bal" + ChatColor.GOLD + "-- Check your current balance.");
+									+ ChatColor.AQUA + "bal" + ChatColor.GOLD
+									+ "-- Check your current balance.");
 						} else {
 							player.sendMessage(ChatColor.RED
 									+ "You don't have permission to use this.");
@@ -132,7 +134,7 @@ public class EcoTP extends JavaPlugin {
 							player.sendMessage(ChatColor.GREEN + "It costs "
 									+ ChatColor.GOLD
 									+ getConfig().getInt("general.tpcost")
-									+ " to teleport");
+									+ ChatColor.GREEN + " to teleport");
 						} else {
 							player.sendMessage(ChatColor.RED
 									+ "You don't have permission to use this.");
@@ -141,6 +143,8 @@ public class EcoTP extends JavaPlugin {
 					} else if (subCommand.equalsIgnoreCase("reload")) {
 						if (player.hasPermission("ecotp.reload")) {
 							reloadConfig();
+							player.sendMessage(ChatColor.GREEN
+									+ "The configuration was reloaded.");
 						} else {
 							player.sendMessage(ChatColor.RED
 									+ "You don't have permission to use this.");
@@ -154,6 +158,9 @@ public class EcoTP extends JavaPlugin {
 
 							getConfig().set("general.tpcost", iprice);
 							saveConfig();
+							player.sendMessage(ChatColor.GREEN
+									+ "The price was set to " + ChatColor.GOLD
+									+ price + ChatColor.GREEN + ".");
 						} else {
 							player.sendMessage(ChatColor.RED
 									+ "You don't have permission to use this.");

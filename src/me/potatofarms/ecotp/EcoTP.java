@@ -1,10 +1,14 @@
 package me.potatofarms.ecotp;
 
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
+
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -60,6 +64,7 @@ public class EcoTP extends JavaPlugin {
 
 	public void loadConfiguration() {
 		getConfig().addDefault("general.tpcost", 200);
+		getConfig().addDefault("general.alert_player_on_tp", true);
 		getConfig().options().copyDefaults(true);
 		saveConfig();
 
@@ -87,11 +92,25 @@ public class EcoTP extends JavaPlugin {
 		return (economy != null);
 	}
 
+	public static boolean isNumeric(String str)
+	{
+	  NumberFormat formatter = NumberFormat.getInstance();
+	  ParsePosition pos = new ParsePosition(0);
+	  formatter.parse(str, pos);
+	  return str.length() == pos.getIndex();
+	}
+	
 	public boolean onCommand(CommandSender sender, Command cmd,
 			String commandLabel, String[] args) {
-		Player player = (Player) sender;
+		Player player = null;
 
-		if (commandLabel.equalsIgnoreCase("ecotp")) {
+		if (commandLabel.equalsIgnoreCase("ecotp")) {			
+			if(!(sender instanceof Player)){
+				sender.sendMessage("Must be used in game.");
+				return false;
+			}else{
+				player = (Player) sender;
+			}
 			String subCommand = args.length > 0 ? args[0].toLowerCase() : "";
 			if (args.length == 0) {
 				player.sendMessage(ChatColor.RED
@@ -111,11 +130,12 @@ public class EcoTP extends JavaPlugin {
 							player.sendMessage(ChatColor.BLUE + "/ecotp "
 									+ ChatColor.AQUA + "bal" + ChatColor.GOLD
 									+ "-- Check your current balance.");
+							return true;
 						} else {
 							player.sendMessage(ChatColor.RED
 									+ "You don't have permission to use this.");
+							return true;
 						}
-						return true;
 
 					} else if (subCommand.equalsIgnoreCase("bal")
 							|| subCommand.equalsIgnoreCase("balance")) {
@@ -124,35 +144,42 @@ public class EcoTP extends JavaPlugin {
 									+ "Your current balance is: "
 									+ ChatColor.GOLD
 									+ economy.getBalance(player.getName()));
+							return true;
 						} else {
 							player.sendMessage(ChatColor.RED
 									+ "You don't have permission to use this.");
+							return true;
 						}
-						return true;
 					} else if (subCommand.equalsIgnoreCase("price")) {
 						if (player.hasPermission("ecotp.price")) {
 							player.sendMessage(ChatColor.GREEN + "It costs "
 									+ ChatColor.GOLD
 									+ getConfig().getInt("general.tpcost")
 									+ ChatColor.GREEN + " to teleport");
+							return true;
 						} else {
 							player.sendMessage(ChatColor.RED
 									+ "You don't have permission to use this.");
+							return true;
 						}
-						return true;
 					} else if (subCommand.equalsIgnoreCase("reload")) {
 						if (player.hasPermission("ecotp.reload")) {
 							reloadConfig();
 							player.sendMessage(ChatColor.GREEN
 									+ "The configuration was reloaded.");
+							return true;
 						} else {
 							player.sendMessage(ChatColor.RED
 									+ "You don't have permission to use this.");
+							return true;
 						}
-						return true;
 					} else if (subCommand.equalsIgnoreCase("setprice")) {
 						if (player.hasPermission("ecotp.setprice")) {
 							String price = args.length > 1 ? args[1] : "";
+							if(price == "" || StringUtils.isNumeric(price) == false){
+								sender.sendMessage(ChatColor.GOLD + "Invalid Price.");
+								return true;
+							}
 							int iprice;
 							iprice = Integer.parseInt(price);
 
@@ -198,6 +225,11 @@ public class EcoTP extends JavaPlugin {
 									+ " has been deducted from your account");
 							// teleport player to other player's location
 							player.teleport(location);
+							if(getConfig().getBoolean("general.alert_player_on_tp") == true) {
+								TargetPlayer.sendMessage(ChatColor.GOLD + player.getName() + " has teleported to you.");
+							}
+							
+							return true;
 						} else if (Balance <= price) {
 							player.sendMessage(ChatColor.RED
 									+ "Not enough money.");
@@ -218,6 +250,7 @@ public class EcoTP extends JavaPlugin {
 			} else if (args.length == 2) {
 				player.sendMessage(ChatColor.RED
 						+ "Invalid Syntax. Correct Syntax is: /ecotp <targetplayer>");
+				return true;
 			}
 
 		}

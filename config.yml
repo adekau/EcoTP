@@ -1,3 +1,4 @@
 general:
   #Set the cost for teleporting.
   tpcost: 200
+  alert_player_on_tp: true
